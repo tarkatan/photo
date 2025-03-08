@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Мої папки</h2>
+<div>
+    <h3>Власні папки</h3>
+    {% for folder in owned_folders %}
+    <div class="folder">
+        <div class="folder-icon">📁</div>
+        <div><a href="{% url 'folder_detail' folder.id %}">{{ folder.name }}</a></div>
+        <div>
+            <form method="post" action="{% url 'delete_folder' folder.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn">Видалити</button>
+            </form>
+            <a href="{% url 'share_folder' folder.id %}" class="btn">Поділитися</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>Немає власних папок.</p>
+    {% endfor %}
+</div>
+
+<div>
+    <h3>Спільні папки</h3>
+    {% for folder in shared_folders %}
+    <div class="folder">
+        <div class="folder-icon">📁</div>
+        <div>
+            <strong>Спільна папка:</strong> {{ folder.name }}
+        </div>
+        <div>
+            <p>З вами поділилися: 
+              {% for share in folder.shares.all %}
+                {{ share.shared_by.username }}{% if not forloop.last %}, {% endif %}
+              {% empty %}
+                невідомо
+              {% endfor %}
+            </p>
+            <a href="{% url 'folder_detail' folder.id %}" class="btn">Відкрити</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>Немає спільних папок.</p>
+    {% endfor %}
+</div>
+
+<div>
+    <h3>Мої вільні зображення</h3>
+    {% for image in free_images %}
+      <div class="image">
+          <img src="{{ image.image_url }}" alt="Image">
+          <div>
+              <form method="post" action="{% url 'delete_image' image.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn">Видалити</button>
+              </form>
+              <a href="{% url 'share_image' image.id %}" class="btn">Поділитися</a>
+          </div>
+      </div>
+    {% empty %}
+      <p>Немає вільних зображень.</p>
+    {% endfor %}
+</div>
+
+<div>
+    <h3>Спільні фото</h3>
+    {% for image in shared_images %}
+      <div class="image">
+          <img src="{{ image.image_url }}" alt="Image">
+          <p>
+            <strong>Спільне фото</strong><br>
+            З вами поділилися: 
+            {% for share in image.shares.all %}
+              {{ share.shared_by.username }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              невідомо
+            {% endfor %}
+          </p>
+          {% if image.folder and image.folder_shared %}
+            <a href="{% url 'folder_detail' image.folder.id %}" class="btn">Переглянути в папці</a>
+          {% endif %}
+      </div>
+    {% empty %}
+      <p>Немає спільних зображень.</p>
+    {% endfor %}
+</div>
+
+<h3>Створити нову папку</h3>
+<form method="post">
+    {% csrf_token %}
+    {{ root_folder_form.as_p }}
+    <button type="submit" name="create_root_folder" class="btn">Створити</button>
+</form>
+{% endblock %}

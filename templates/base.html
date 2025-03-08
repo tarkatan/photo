@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Хмарна Галерея</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+      header { background: #333; color: #fff; padding: 10px 20px; text-align: center; }
+      header p { margin: 0; font-size: 14px; }
+      nav a, nav form { color: #fff; margin: 0 10px; text-decoration: none; display: inline-block; }
+      .container { padding: 20px; }
+      .folder, .image { display: inline-block; margin: 10px; text-align: center; vertical-align: top; }
+      .folder-icon { font-size: 60px; }
+      .image img { max-width: 200px; height: auto; border: 1px solid #ddd; padding: 5px; background: #fff; }
+      @media (max-width: 600px) {
+          .folder, .image { width: 100%; margin: 10px 0; }
+      }
+      .btn { padding: 5px 10px; background: #333; color: #fff; text-decoration: none; border: none; cursor: pointer; }
+      .btn:hover { background: #555; }
+      form { margin-top: 20px; }
+      input[type="text"], input[type="file"], input[type="password"] { padding: 5px; width: 100%; max-width: 300px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Хмарна Галерея</h1>
+        {% if user.is_authenticated %}
+            <p>Ви увійшли як: <strong>{{ user.username }}</strong></p>
+            <nav>
+                <a href="{% url 'folder_list' %}">Мої папки</a>
+                <a href="{% url 'upload_image_free' %}" class="btn">Завантажити зображення без папки</a>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn">Вихід</button>
+                </form>
+            </nav>
+        {% else %}
+            <nav>
+                <a href="{% url 'login' %}">Вхід</a>
+                <a href="{% url 'register' %}">Реєстрація</a>
+            </nav>
+        {% endif %}
+    </header>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

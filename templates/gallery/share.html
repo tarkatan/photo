@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Поділитися {{ object_type }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Поділитися</button>
+</form>
+<p>
+    <a href="{% url 'folder_list' %}" class="btn">Повернутись до головної</a>
+</p>
+{% endblock %}

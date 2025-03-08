@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Спільні ресурси</h2>
+
+<div>
+    <h3>Спільні папки</h3>
+    {% if shared_folders %}
+      <div>
+        {% for folder in shared_folders %}
+          <div class="folder">
+             <div class="folder-icon">📁</div>
+             <div>
+               <a href="{% url 'folder_detail' folder.id %}">{{ folder.name }}</a>
+             </div>
+             <p>З вами поділилися: 
+               {% for share in folder.shares.all %}
+                  {{ share.shared_by.username }}{% if not forloop.last %}, {% endif %}
+               {% empty %}
+                  невідомо
+               {% endfor %}
+             </p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Спільних папок не знайдено.</p>
+    {% endif %}
+</div>
+
+<div>
+    <h3>Спільні зображення</h3>
+    {% if shared_images %}
+      <div>
+        {% for image in shared_images %}
+          <div class="image">
+             <img src="{{ image.image_url }}" alt="Image">
+             <p>З вами поділилися: 
+               {% for share in image.shares.all %}
+                  {{ share.shared_by.username }}{% if not forloop.last %}, {% endif %}
+               {% empty %}
+                  невідомо
+               {% endfor %}
+             </p>
+             {% if image.folder and image.folder.shares.filter(user=request.user, permission="view").exists %}
+               <a href="{% url 'folder_detail' image.folder.id %}" class="btn">Відкрити</a>
+             {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Спільних зображень не знайдено.</p>
+    {% endif %}
+</div>
+
+<p><a href="{% url 'folder_list' %}" class="btn">Повернутись до головної</a></p>
+{% endblock %}
+

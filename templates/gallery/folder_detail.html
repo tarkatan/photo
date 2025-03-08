@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="breadcrumb">
+    <a href="{% url 'folder_list' %}">Головна</a>
+</div>
+
+<h2>Папка: {{ folder.name }}</h2>
+
+{% if share_record %}
+  <p>З вами поділилися: {{ share_record.shared_by.username }} ({{ share_record.permission|title }})</p>
+{% endif %}
+
+<h3>Підпапки</h3>
+<div>
+    {% for sub in subfolders %}
+    <div class="folder">
+        <div class="folder-icon">📁</div>
+        <div><a href="{% url 'folder_detail' sub.id %}">{{ sub.name }}</a></div>
+        <div>
+            {% if sub.user == request.user %}
+                <form method="post" action="{% url 'delete_folder' sub.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn">Видалити</button>
+                </form>
+                <a href="{% url 'share_folder' sub.id %}" class="btn">Поділитися</a>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p>Підпапки відсутні.</p>
+    {% endfor %}
+</div>
+
+<h3>Зображення</h3>
+<div>
+    {% for image in images %}
+    <div class="image">
+        <img src="{{ image.image_url }}" alt="Image">
+        <div>
+            {% if image.user == request.user %}
+                <form method="post" action="{% url 'delete_image' image.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn">Видалити</button>
+                </form>
+                <a href="{% url 'share_image' image.id %}" class="btn">Поділитися</a>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p>Зображень не завантажено.</p>
+    {% endfor %}
+</div>
+
+{% if can_add %}
+  <h3>Створити підпапку</h3>
+  <form method="post">
+      {% csrf_token %}
+      {{ folder_form.as_p }}
+      <button type="submit" name="create_folder" class="btn">Створити підпапку</button>
+  </form>
+
+  <h3>Завантажити зображення</h3>
+  <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ image_form.as_p }}
+      <button type="submit" name="upload_image" class="btn">Завантажити</button>
+  </form>
+{% endif %}
+
+<div>
+    <p><a href="{% url 'folder_list' %}" class="btn">Повернутись до головної</a></p>
+</div>
+{% endblock %}
